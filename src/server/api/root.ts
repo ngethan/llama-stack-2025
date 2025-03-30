@@ -1,6 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { mercoaRouter } from "./routers/mercoa";
 import { businessRouter } from "./routers/business";
+import { healthcareRouter } from "./routers/healthcare";
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { businessRouter } from "./routers/business";
 export const appRouter = createTRPCRouter({
   mercoa: mercoaRouter,
   business: businessRouter,
+  healthcare: healthcareRouter,
 });
 
 // export type definition of API

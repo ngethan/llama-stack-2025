@@ -1,22 +1,20 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
-  integer,
-  numeric,
   pgEnum,
   pgTable,
   text,
   timestamp,
   varchar,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
-export const business_type = pgEnum("business_type", [
-  "SOLE_PROPRIETORSHIP",
-  "PARTNERSHIP",
-  "LLC",
-  "CORPORATION",
-  "S_CORPORATION",
-  "NON_PROFIT",
+export const document_type = pgEnum("document_type", [
+  "PRESCRIPTION",
+  "LAB_REPORT",
+  "IMAGING_REPORT",
+  "VACCINATION_RECORD",
+  "INSURANCE_CARD",
   "OTHER",
 ]);
 
@@ -29,65 +27,78 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull(),
 });
 
-export const businesses = pgTable("businesses", {
+export const healthcareDocuments = pgTable("healthcare_documents", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  email: varchar("email", { length: 255 }).notNull(),
-  legalName: varchar("legalName", { length: 255 }),
-  website: varchar("website", { length: 255 }),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  type: document_type("type").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  businessType: business_type("businessType"),
-  ein: varchar("ein", { length: 100 }),
-  address: varchar("address", { length: 255 }),
-  phone: varchar("phone", { length: 50 }),
-  industryMccCode: varchar("industryMccCode", { length: 50 }),
-  averageTransactionSize: numeric("averageTransactionSize", {
-    precision: 10,
-    scale: 2,
-  }),
-  averageMonthlyTransactionVolume: numeric("averageMonthlyTransactionVolume", {
-    precision: 10,
-    scale: 2,
-  }),
-  maximumTransactionSize: numeric("maximumTransactionSize", {
-    precision: 10,
-    scale: 2,
-  }),
-  acceptTermsOfService: boolean("acceptTermsOfService"),
+  fileUrl: varchar("fileUrl", { length: 255 }).notNull(),
+  ocrText: text("ocrText"),
+  extractedData: jsonb("extractedData"),
+  createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
 });
 
-export const businessesRelations = relations(businesses, ({ many }) => ({
-  representatives: many(businessRepresentatives),
+export const medicalConditions = pgTable("medical_conditions", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  diagnosisDate: timestamp("diagnosisDate", { precision: 3 }),
+  severity: varchar("severity", { length: 50 }),
+  status: varchar("status", { length: 50 }),
+  medications: jsonb("medications"),
+  createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  isUser: boolean("isUser").notNull(),
+  createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  documents: many(healthcareDocuments),
+  conditions: many(medicalConditions),
+  messages: many(chatMessages),
 }));
 
-export const businessRepresentatives = pgTable("business_representatives", {
-  id: varchar("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  businessId: varchar("businessId", { length: 255 }).notNull(),
-  legalName: varchar("legalName", { length: 255 }).notNull(),
-  personalAddress: text("personalAddress").notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  dateOfBirth: timestamp("dateOfBirth", {
-    mode: "date",
-    precision: 3,
-  }).notNull(),
-  fullSSN: varchar("fullSSN", { length: 50 }).notNull(),
-  isOwner: boolean("isOwner").default(false),
-  ownershipPercentage: integer("ownershipPercentage"),
-  isController: boolean("isController").default(false),
-  jobTitle: varchar("jobTitle", { length: 255 }),
-});
-
-export const businessRepresentativesRelations = relations(
-  businessRepresentatives,
+export const healthcareDocumentsRelations = relations(
+  healthcareDocuments,
   ({ one }) => ({
-    business: one(businesses, {
-      fields: [businessRepresentatives.businessId],
-      references: [businesses.id],
+    user: one(users, {
+      fields: [healthcareDocuments.userId],
+      references: [users.id],
     }),
   }),
 );
+
+export const medicalConditionsRelations = relations(
+  medicalConditions,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [medicalConditions.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  user: one(users, {
+    fields: [chatMessages.userId],
+    references: [users.id],
+  }),
+}));

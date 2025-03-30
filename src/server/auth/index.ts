@@ -23,7 +23,7 @@ export async function signInWithEmailAndPassword(
 ): Promise<string | undefined> {
   const supabase = await createSupabaseServerClient();
 
-  const user = await db.query.businesses.findFirst({
+  const user = await db.query.users.findFirst({
     where: (u, { eq }) => eq(u.email, data.email),
   });
   if (!user) {

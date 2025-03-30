@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import type { Business } from "@/types";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -40,62 +39,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
+  if (!user && !request.nextUrl.pathname.startsWith("/auth")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { data: businessData, error } = await supabase
-    .from("businesses")
-    .select("*")
-    .eq("id", user?.id)
-    .single();
-  if (error) console.error(error);
-
-  if (businessData) {
-    const route = KYB(
-      businessData as Business,
-      request.nextUrl.pathname.toLowerCase(),
-    );
-
-    if (route) return NextResponse.redirect(new URL(route, request.url));
-  }
-
   return supabaseResponse;
-}
-
-function KYB(b: Business, requestUrl: string): string | undefined {
-  const required = [
-    b.id,
-    b.legalName,
-    b.website,
-    b.description,
-    b.ein,
-    b.address,
-    b.phone,
-    b.industryMccCode,
-    b.averageTransactionSize,
-    b.averageMonthlyTransactionVolume,
-    b.maximumTransactionSize,
-    b.acceptTermsOfService,
-    b.email,
-    b.businessType,
-  ];
-
-  if (requestUrl.startsWith("/auth/login")) return;
-  else if (!requestUrl.startsWith("/kyb-intake") && required.some((r) => !r)) {
-    return "/kyb-intake";
-  } else if (
-    requestUrl.startsWith("/kyb-intake") &&
-    !required.some((r) => !r)
-  ) {
-    return "/dashboard";
-  }
-  return;
 }

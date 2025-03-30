@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742502486064,
-      "tag": "0000_demonic_captain_universe",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1742527388295,
-      "tag": "0001_yellow_lady_ursula",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1742528703196,
-      "tag": "0002_spicy_sue_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1742528796686,
-      "tag": "0003_lumpy_groot",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1742528880234,
-      "tag": "0004_smiling_captain_cross",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1742537830449,
-      "tag": "0005_cheerful_ben_grimm",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1742540037485,
-      "tag": "0006_mute_otto_octavius",
+      "when": 1743352954219,
+      "tag": "0000_rare_viper",
       "breakpoints": true
     }
   ]

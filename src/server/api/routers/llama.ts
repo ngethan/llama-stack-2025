@@ -10,7 +10,7 @@ export const llamaRouter = createTRPCRouter({
         title: z.string(),
         type: z.enum(document_type.enumValues),
         base64Data: z.string(),
-        fileType: z.string(),
+        publicUrl: z.string(),
         description: z.string().optional(),
       }),
     )
@@ -37,27 +37,29 @@ export const llamaRouter = createTRPCRouter({
         }),
       });
 
-      console.log(2)
+      console.log(2);
       if (!llamaResponse.ok) {
         throw new Error(`Llama API error: ${llamaResponse.statusText}`);
       }
-      console.log(3)
+      console.log(3);
 
-      console.log(llamaResponse)
+      console.log(llamaResponse);
       const result = await llamaResponse.json();
 
-      console.log(4)
+      console.log(4);
       const ocrText = result.message?.content ?? "";
-      console.log(ocrText)
+      console.log(ocrText);
+
       const document = await ctx.db
         .insert(healthcareDocuments)
         .values({
           userId: ctx.session.user.id,
-          ocrText: ocrText,
+          ocrText: ocrText as string,
+          fileUrl: input.publicUrl,
           ...input,
         })
         .returning();
-        console.log(6)
+      console.log(6);
 
       return {
         success: true,

@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 type DocumentType =
   | "PRESCRIPTION"
@@ -34,8 +35,7 @@ type DocumentType =
   | "OTHER";
 
 async function fileToBase64(file: File): Promise<string> {
-  // Add file size check
-  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_SIZE = 10 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
     throw new Error("File size exceeds 10MB limit");
   }
@@ -44,7 +44,6 @@ async function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Get the base64 portion of the data URL
       const base64 = result.split(",")[1];
       if (base64) resolve(base64);
     };
@@ -60,6 +59,7 @@ export function UploadDialog() {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const utils = api.useContext();
+  const supabase = createSupabaseBrowserClient();
 
   const ocrMutation = api.llama.ocr.useMutation({
     onSuccess: async (result) => {
@@ -71,7 +71,7 @@ export function UploadDialog() {
         await utils.healthcare.getDocuments.invalidate();
       } else {
         toast.error("OCR Failed", {
-          description: result.error ?? "Failed to extract text from document",
+          description: "Failed to extract text from document",
         });
       }
     },
@@ -88,12 +88,31 @@ export function UploadDialog() {
     setIsUploading(true);
     try {
       const base64Data = await fileToBase64(file);
+      const imageId = crypto.randomUUID();
+
+      const { data, error: uploadError } = await supabase.storage
+        .from("health-documents")
+        .upload(`/public/${imageId}`, file, {
+          upsert: false,
+        });
+
+      console.log(data);
+      if (uploadError) {
+        throw new Error(`Failed to upload to storage: ${uploadError.message}`);
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("health-documents")
+        .getPublicUrl(`/public/${imageId}`);
 
       await ocrMutation.mutateAsync({
         base64Data,
         title,
         type,
         fileType: file.type,
+        publicUrl,
         ...(description ? { description } : {}),
       });
 

@@ -1,7 +1,10 @@
-import { document_type, healthcareDocuments } from "@/server/db/schema";
+import { document_type, healthcareDocuments, memory } from "@/server/db/schema";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { drizzle } from "drizzle-orm/postgres-js";
+
 import { TIMEOUT } from "dns";
+import { memo } from "react";
 
 export const llamaRouter = createTRPCRouter({
   ocr: protectedProcedure
@@ -17,6 +20,12 @@ export const llamaRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       // try {
       const base64Image = input.base64Data;
+
+      await ctx.db.insert(memory).values({
+        userId: ctx.session.user.id,
+        memory: base64Image
+      })
+
       const llamaResponse = await fetch("http://localhost:11434/api/chat", {
         method: "POST",
         headers: {
@@ -36,6 +45,8 @@ export const llamaRouter = createTRPCRouter({
           TIMEOUT: 10000,
         }),
       });
+
+
 
       console.log(2);
       if (!llamaResponse.ok) {

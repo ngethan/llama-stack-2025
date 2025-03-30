@@ -1,6 +1,7 @@
 import { document_type, healthcareDocuments } from "@/server/db/schema";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { TIMEOUT } from "dns";
 
 export const llamaRouter = createTRPCRouter({
   ocr: protectedProcedure
@@ -16,7 +17,6 @@ export const llamaRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       // try {
       const base64Image = input.base64Data;
-
       const llamaResponse = await fetch("http://localhost:11434/api/chat", {
         method: "POST",
         headers: {
@@ -32,18 +32,23 @@ export const llamaRouter = createTRPCRouter({
               images: [base64Image],
             },
           ],
+          stream: false,
+          TIMEOUT: 10000,
         }),
       });
 
+      console.log(2)
       if (!llamaResponse.ok) {
         throw new Error(`Llama API error: ${llamaResponse.statusText}`);
       }
+      console.log(3)
 
-      const result = (await llamaResponse.json()) as {
-        message?: { content: string };
-      };
+      console.log(llamaResponse)
+      const result = await llamaResponse.json();
+
+      console.log(4)
       const ocrText = result.message?.content ?? "";
-
+      console.log(ocrText)
       const document = await ctx.db
         .insert(healthcareDocuments)
         .values({
@@ -52,6 +57,7 @@ export const llamaRouter = createTRPCRouter({
           ...input,
         })
         .returning();
+        console.log(6)
 
       return {
         success: true,

@@ -67,10 +67,12 @@ export function UploadDialog() {
 
     setIsUploading(true);
     try {
-      const fileUrl = URL.createObjectURL(file);
+      const buffer = await file.arrayBuffer();
+      const base64Data = Buffer.from(buffer).toString("base64");
+      console.log(base64Data, "base 64 data");
 
       await ocrMutation.mutateAsync({
-        fileUrl,
+        base64Data,
         title,
         type,
         ...(description ? { description } : {}),
@@ -80,7 +82,6 @@ export function UploadDialog() {
       setTitle("");
       setType("OTHER");
       setDescription("");
-      URL.revokeObjectURL(fileUrl);
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {

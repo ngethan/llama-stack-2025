@@ -2,8 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileText, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
@@ -49,7 +48,7 @@ export function DocumentUpload() {
       "application/pdf": [".pdf"],
       "image/*": [".png", ".jpg", ".jpeg"],
     },
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 10 * 1024 * 1024,
   });
 
   return (

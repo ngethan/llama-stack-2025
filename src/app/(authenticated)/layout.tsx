@@ -15,6 +15,9 @@ import {
   LogOut,
   User,
   UserCircle2,
+  FileText,
+  Pill,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -46,7 +49,7 @@ export default async function RootLayout({
         <div className="flex min-h-screen w-[100vw] flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4">
             <div className="flex items-center gap-2 text-xl font-bold">
-              MERCOA
+              LlamaDoc
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2"></div>
@@ -84,10 +87,10 @@ export default async function RootLayout({
           <div className="flex flex-1">
             <Sidebar>
               <SidebarContent>
-                <SidebarMenu className="mx-2 w-[100%-1rem]">
+                <SidebarMenu className="mx-2 mt-[4.5rem] w-[100%-1rem]">
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive>
-                      <Link href="#">
+                    <SidebarMenuButton asChild>
+                      <Link href="/dashboard">
                         <Home className="h-4 w-4" />
                         <span>Dashboard</span>
                       </Link>
@@ -95,50 +98,25 @@ export default async function RootLayout({
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <Users className="h-4 w-4" />
-                        <span>Entities</span>
+                      <Link href="/dashboard/health">
+                        <FileText className="h-4 w-4" />
+                        <span>Health Documents</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <UsersRound className="h-4 w-4" />
-                        <span>Entity Groups</span>
+                      <Link href="/dashboard/health?tab=medications">
+                        <Pill className="h-4 w-4" />
+                        <span>Medications</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>Transactions</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <CreditCard className="h-4 w-4" />
-                        <span>Payment Methods</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <Settings className="h-4 w-4" />
-                        <span>Admin Tools</span>
-                        <ChevronDown className="ml-auto h-4 w-4" />
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <Settings className="h-4 w-4" />
-                        <span>Developer Settings</span>
+                      <Link href="/dashboard/health?tab=chat">
+                        <MessageSquare className="h-4 w-4" />
+                        <span>Health Assistant</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -153,7 +131,7 @@ export default async function RootLayout({
                 </SidebarMenu>
               </SidebarContent>
             </Sidebar>
-            {children}{" "}
+            {children}
           </div>
         </div>
       </SidebarProvider>

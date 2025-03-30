@@ -174,4 +174,34 @@ export const healthcareRouter = createTRPCRouter({
       });
     }
   }),
+
+  getDocument: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      try {
+        const document = await ctx.db
+          .select()
+          .from(healthcareDocuments)
+          .where(
+            eq(healthcareDocuments.id, input.id),
+            eq(healthcareDocuments.userId, ctx.session.user.id),
+          )
+          .limit(1);
+
+        if (!document.length) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Document not found",
+          });
+        }
+
+        return document[0];
+      } catch (error) {
+        console.error("Error fetching document:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch document",
+        });
+      }
+    }),
 });

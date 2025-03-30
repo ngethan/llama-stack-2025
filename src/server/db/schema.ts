@@ -59,6 +59,15 @@ export const medicalConditions = pgTable("medical_conditions", {
   updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
 });
 
+export const memory = pgTable("memory", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  memory: text("memory").notNull(),
+});
+
 export const chatMessages = pgTable("chat_messages", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -66,8 +75,20 @@ export const chatMessages = pgTable("chat_messages", {
     .$defaultFn(() => crypto.randomUUID()),
   userId: varchar("userId", { length: 255 }).notNull(),
   message: text("message").notNull(),
+  conversationId: varchar("conversationId", { length: 255 }).notNull(),
   isUser: boolean("isUser").notNull(),
   createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
+});
+
+export const conversations = pgTable("conversations", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  lastUpdated: timestamp("lastUpdated", { precision: 3 })
+    .notNull()
+    .defaultNow(),
 });
 
 export const medications = pgTable("medications", {

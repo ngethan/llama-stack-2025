@@ -111,7 +111,6 @@ export function UploadDialog() {
         base64Data,
         title,
         type,
-        fileType: file.type,
         publicUrl,
         ...(description ? { description } : {}),
       });

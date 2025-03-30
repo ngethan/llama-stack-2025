@@ -31,7 +31,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
@@ -56,7 +56,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <a
                   href="#"
-                  className="text-primary text-sm underline-offset-4 hover:underline"
+                  className="text-sm text-primary underline-offset-4 hover:underline"
                 >
                   Forgot password?
                 </a>

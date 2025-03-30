@@ -1,7 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { healthcareRouter } from "./routers/healthcare";
 import { llamaRouter } from "./routers/llama";
-
+import { chatRouter } from "./routers/chat";
 /**
  * This is the primary router for your server.
  *
@@ -10,6 +10,7 @@ import { llamaRouter } from "./routers/llama";
 export const appRouter = createTRPCRouter({
   healthcare: healthcareRouter,
   llama: llamaRouter,
+  chat: chatRouter,
 });
 
 // export type definition of API

@@ -124,7 +124,6 @@ export const healthcareRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        // Save user message
         const userMessage = await ctx.db
           .insert(chatMessages)
           .values({

@@ -3,11 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Pill, MessageSquare } from "lucide-react";
 import { DocumentList } from "@/components/healthcare/document-list";
-import { Medications } from "@/components/healthcare/medications";
-import { ChatInterface } from "@/components/healthcare/chat-interface";
 
 export default function HealthDashboard() {
   const searchParams = useSearchParams();

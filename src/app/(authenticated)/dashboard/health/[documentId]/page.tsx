@@ -15,52 +15,73 @@ export default function DocumentPage() {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
 
   if (!document) {
-    return <div>Document not found</div>;
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-muted-foreground">Document not found</div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto max-w-5xl space-y-8 py-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/health">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="hover:bg-muted">
+              <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">{document.title}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {document.title}
+          </h1>
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="hover:bg-muted">
           <Download className="mr-2 h-4 w-4" />
           Download
         </Button>
       </div>
 
-      <div className="rounded-lg border bg-card p-6">
-        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Type: {document.type}</span>
-          <span>•</span>
-          <span>
-            Added: {new Date(document.createdAt).toLocaleDateString()}
-          </span>
+      <div className="rounded-xl border bg-card shadow-sm">
+        <div className="border-b p-6">
+          <div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              Type:{" "}
+              <span className="font-medium text-foreground">
+                {document.type}
+              </span>
+            </span>
+            <span>•</span>
+            <span>
+              Added:{" "}
+              <span className="font-medium text-foreground">
+                {new Date(document.createdAt).toLocaleDateString()}
+              </span>
+            </span>
+          </div>
+
+          {document.description && (
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {document.description}
+            </p>
+          )}
         </div>
 
-        {document.description && (
-          <p className="mb-4 text-sm text-muted-foreground">
-            {document.description}
-          </p>
-        )}
-
-        <div className="aspect-[16/9] rounded-lg border bg-muted">
-          {/* Render document preview here based on type */}
-          <iframe
-            src={document.fileUrl}
-            className="h-full w-full rounded-lg"
-            title={document.title}
-          />
+        <div className="p-6">
+          <div className="overflow-hidden rounded-lg border bg-muted">
+            <iframe
+              src={document.fileUrl}
+              className="h-[600px] w-full rounded-lg"
+              title={document.title}
+            />
+          </div>
         </div>
       </div>
     </div>

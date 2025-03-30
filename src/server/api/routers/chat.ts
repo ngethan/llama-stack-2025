@@ -141,14 +141,10 @@ export const chatRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-
-      // Delete messages first (foreign key constraint)
       await ctx.db
         .delete(chatMessages)
         .where(eq(chatMessages.conversationId, input.conversationId));
 
-      // Then delete the conversation
       await ctx.db
         .delete(conversations)
         .where(eq(conversations.id, input.conversationId));

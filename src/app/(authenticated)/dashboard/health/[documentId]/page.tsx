@@ -5,10 +5,14 @@ import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import ReactMarkdown from "react-markdown";
 
 export default function DocumentPage() {
   const params = useParams();
   const documentId = params.documentId as string;
+  const [activeTab, setActiveTab] = useState("preview");
 
   const { data: document, isLoading } = api.healthcare.getDocument.useQuery({
     id: documentId,
@@ -31,7 +35,7 @@ export default function DocumentPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl space-y-8 py-8">
+    <div className="container mx-4 max-w-5xl space-y-8 py-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/health">
@@ -75,13 +79,36 @@ export default function DocumentPage() {
         </div>
 
         <div className="p-6">
-          <div className="overflow-hidden rounded-lg border bg-muted">
-            <iframe
-              src={document.fileUrl}
-              className="h-[600px] w-full rounded-lg"
-              title={document.title}
-            />
-          </div>
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="mb-4">
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+              <TabsTrigger value="raw">Raw Text</TabsTrigger>
+            </TabsList>
+            <TabsContent value="preview" className="mt-0">
+              <div className="overflow-hidden rounded-lg border bg-muted">
+                <iframe
+                  src={document.fileUrl}
+                  className="h-[600px] w-full rounded-lg"
+                  title={document.title}
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="raw" className="mt-0">
+              <div className="h-[600px] overflow-auto rounded-lg border bg-muted p-4">
+                {document.ocrText ? (
+                  <ReactMarkdown>{document.ocrText}</ReactMarkdown>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No OCR text available for this document.
+                  </p>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

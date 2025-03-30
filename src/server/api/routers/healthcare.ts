@@ -120,6 +120,7 @@ export const healthcareRouter = createTRPCRouter({
     .input(
       z.object({
         message: z.string(),
+        conversationId: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -130,6 +131,7 @@ export const healthcareRouter = createTRPCRouter({
             userId: ctx.session.user.id,
             message: input.message,
             isUser: true,
+            conversationId: input.conversationId,
           })
           .returning();
 
@@ -141,6 +143,7 @@ export const healthcareRouter = createTRPCRouter({
             userId: ctx.session.user.id,
             message: "I'm your healthcare assistant. How can I help you today?",
             isUser: false,
+            conversationId: input.conversationId,
           })
           .returning();
 

@@ -1,12 +1,7 @@
 import { document_type, healthcareDocuments } from "@/server/db/schema";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { LlamaStackClient } from "llama-stack-client";
 
-const client = new LlamaStackClient({
-  // baseURL: "http://localhost:11434",
-  timeout: 10000,
-});
 export const llamaRouter = createTRPCRouter({
   ocr: protectedProcedure
     .input(
@@ -24,30 +19,32 @@ export const llamaRouter = createTRPCRouter({
         const buffer = Buffer.from(await blob.arrayBuffer());
         const base64Image = buffer.toString("base64");
 
-        const result = await client.inference.chatCompletion({
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "image",
-                  image: {
-                    data: base64Image,
-                  },
-                  prompt:
-                    "Act as an OCR assistant. Analyze the provided image and:\n1. Recognize all visible text in the image as accurately as possible.\n2. Maintain the original structure and formatting of the text.\n3. If any words or phrases are unclear, indicate this with [unclear] in your transcription.\nProvide only the transcription without any additional comments.",
-                },
-              ],
-            },
-          ],
+        const llamaResponse = await fetch("http://localhost:11434/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "llama3.2-vision",
+            messages: [
+              {
+                role: "user",
+                content:
+                  "Act as an OCR assistant. Analyze the provided image and:\n1. Recognize all visible text in the image as accurately as possible.\n2. Maintain the original structure and formatting of the text.\n3. If any words or phrases are unclear, indicate this with [unclear] in your transcription.\nProvide only the transcription without any additional comments.",
+                images: [base64Image],
+              },
+            ],
+          }),
         });
 
-        console.log(result);
+        if (!llamaResponse.ok) {
+          throw new Error(`Llama API error: ${llamaResponse.statusText}`);
+        }
 
-        const ocrText =
-          typeof result.completion_message.content === "object"
-            ? JSON.stringify(result.completion_message.content)
-            : String(result.completion_message.content);
+        const result = (await llamaResponse.json()) as {
+          message?: { content: string };
+        };
+        const ocrText = result.message?.content ?? "";
 
         const document = await ctx.db
           .insert(healthcareDocuments)

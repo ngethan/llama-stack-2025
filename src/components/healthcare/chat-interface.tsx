@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -260,7 +261,7 @@ export function ChatInterface() {
                       message.isUser ? "bg-primary text-primary-foreground" : ""
                     }`}
                   >
-                    {message.message}
+                    <ReactMarkdown>{message.message}</ReactMarkdown>
                   </Card>
                 </div>
               ))

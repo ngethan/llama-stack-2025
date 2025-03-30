@@ -33,6 +33,26 @@ type DocumentType =
   | "INSURANCE_CARD"
   | "OTHER";
 
+async function fileToBase64(file: File): Promise<string> {
+  // Add file size check
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_SIZE) {
+    throw new Error("File size exceeds 10MB limit");
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Get the base64 portion of the data URL
+      const base64 = result.split(",")[1];
+      if (base64) resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function UploadDialog() {
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -67,14 +87,13 @@ export function UploadDialog() {
 
     setIsUploading(true);
     try {
-      const buffer = await file.arrayBuffer();
-      const base64Data = Buffer.from(buffer).toString("base64");
-      console.log(base64Data, "base 64 data");
+      const base64Data = await fileToBase64(file);
 
       await ocrMutation.mutateAsync({
         base64Data,
         title,
         type,
+        fileType: file.type,
         ...(description ? { description } : {}),
       });
 
@@ -84,6 +103,10 @@ export function UploadDialog() {
       setDescription("");
     } catch (error) {
       console.error("Upload failed:", error);
+      toast.error("Upload Failed", {
+        description:
+          error instanceof Error ? error.message : "Failed to upload file",
+      });
     } finally {
       setIsUploading(false);
     }

@@ -9,6 +9,7 @@ export const llamaRouter = createTRPCRouter({
         title: z.string(),
         type: z.enum(document_type.enumValues),
         base64Data: z.string(),
+        fileType: z.string(),
         description: z.string().optional(),
       }),
     )

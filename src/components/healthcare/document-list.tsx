@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, FileText, FileImage, Search, FileScan } from "lucide-react";
+import { FileText, FileImage, Search, FileScan } from "lucide-react";
 import { UploadDialog } from "./upload-dialog";
 import { useRouter } from "next/navigation";
 import { api, type RouterOutputs } from "@/trpc/react";
@@ -23,14 +22,6 @@ export function DocumentList() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "name" | "size">("date");
   const router = useRouter();
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[200px] items-center justify-center">
-        <div className="text-muted-foreground">Loading documents...</div>
-      </div>
-    );
-  }
 
   const filteredDocuments = (documents ?? []).filter((doc) => {
     const matchesSearch = doc.title
@@ -50,14 +41,12 @@ export function DocumentList() {
       case "name":
         return a.title.localeCompare(b.title);
       case "size":
-        // If you don't have size in your DB, you might want to remove this option
         return 0;
       default:
         return 0;
     }
   });
 
-  // Update the SelectContent for categories to match your DB enum
   const categoryContent = (
     <SelectContent>
       <SelectItem value="all">All Categories</SelectItem>
@@ -70,7 +59,6 @@ export function DocumentList() {
     </SelectContent>
   );
 
-  // Update the document card rendering to match your DB schema
   const documentCard = (doc: Document) => (
     <div
       key={doc.id}
@@ -94,19 +82,14 @@ export function DocumentList() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="absolute right-2 top-2 flex -translate-y-1 gap-1 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <FileText className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Upload className="h-4 w-4" />
-        </Button>
-      </div>
+      {doc.ocrText && (
+        <div className="mt-2 text-sm text-muted-foreground">
+          <div className="line-clamp-2">{doc.ocrText}</div>
+        </div>
+      )}
     </div>
   );
 
-  // Update the getDocumentIcon function to match your document types
   const getDocumentIcon = (type: Document["type"]) => {
     switch (type) {
       case "LAB_REPORT":
@@ -163,21 +146,28 @@ export function DocumentList() {
         </div>
       </div>
 
-      {/* Documents Grid */}
-      {sortedAndFilteredDocuments.length === 0 ? (
-        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-          <FileText className="h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-4 font-medium">No documents found</h3>
-          <p className="text-sm text-muted-foreground">
-            {searchQuery || categoryFilter !== "all"
-              ? "Try adjusting your search or filters"
-              : "Upload your first document to get started"}
-          </p>
+      {isLoading ? (
+        <div className="flex min-h-[200px] items-center justify-center">
+          <div className="text-muted-foreground">Loading documents...</div>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedAndFilteredDocuments.map(documentCard)}
-        </div>
+        <>
+          {sortedAndFilteredDocuments.length === 0 ? (
+            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+              <FileText className="h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 font-medium">No documents found</h3>
+              <p className="text-sm text-muted-foreground">
+                {searchQuery || categoryFilter !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "Upload your first document to get started"}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sortedAndFilteredDocuments.map(documentCard)}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

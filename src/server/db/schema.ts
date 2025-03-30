@@ -70,6 +70,21 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
 });
 
+export const medications = pgTable("medications", {
+  id: varchar("id", { length: 256 })
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("userId", { length: 256 }).notNull(),
+  name: varchar("name", { length: 256 }).notNull(),
+  dosage: varchar("dosage", { length: 256 }).notNull(),
+  frequency: varchar("frequency", { length: 256 }).notNull(),
+  startDate: varchar("startDate", { length: 256 }).notNull(),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   documents: many(healthcareDocuments),
   conditions: many(medicalConditions),

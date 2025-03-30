@@ -3,14 +3,8 @@ import { readUserSession } from "@/server/auth";
 import { redirect } from "next/navigation";
 
 import {
-  ChevronDown,
-  CreditCard,
   Home,
-  LayoutDashboard,
   Settings,
-  Users,
-  UsersRound,
-  BarChart,
   HelpCircle,
   LogOut,
   User,
@@ -35,7 +29,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
 export default async function RootLayout({
   children,
@@ -106,25 +99,17 @@ export default async function RootLayout({
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link href="/dashboard/health?tab=medications">
+                      <Link href="/dashboard/medication">
                         <Pill className="h-4 w-4" />
-                        <span>Medications</span>
+                        <span>Medication</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link href="/dashboard/health?tab=chat">
+                      <Link href="/dashboard/health-assistant">
                         <MessageSquare className="h-4 w-4" />
                         <span>Health Assistant</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="#">
-                        <BarChart className="h-4 w-4" />
-                        <span>Usage</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

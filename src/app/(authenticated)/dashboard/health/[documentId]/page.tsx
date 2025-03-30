@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, ArrowLeft } from "lucide-react";
+import { Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function DocumentPage() {

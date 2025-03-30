@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Mercoa Take Home",
+  title: "LlamaDoc",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

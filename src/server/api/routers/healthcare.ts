@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import {
   healthcareDocuments,
   medicalConditions,
   chatMessages,
   document_type,
+  medications,
 } from "@/server/db/schema";
 
 const documentUploadSchema = z.object({
@@ -183,8 +184,10 @@ export const healthcareRouter = createTRPCRouter({
           .select()
           .from(healthcareDocuments)
           .where(
-            eq(healthcareDocuments.id, input.id),
-            eq(healthcareDocuments.userId, ctx.session.user.id),
+            and(
+              eq(healthcareDocuments.id, input.id),
+              eq(healthcareDocuments.userId, ctx.session.user.id),
+            ),
           )
           .limit(1);
 
@@ -203,5 +206,77 @@ export const healthcareRouter = createTRPCRouter({
           message: "Failed to fetch document",
         });
       }
+    }),
+
+  addMedication: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        dosage: z.string(),
+        frequency: z.string(),
+        startDate: z.string(),
+        active: z.boolean(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const medication = await ctx.db
+          .insert(medications)
+          .values({
+            userId: ctx.session.user.id,
+            ...input,
+          })
+          .returning();
+
+        return medication[0];
+      } catch (error) {
+        console.error("Error adding medication:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to add medication",
+        });
+      }
+    }),
+
+  getMedications: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      const meds = await ctx.db
+        .select()
+        .from(medications)
+        .where(eq(medications.userId, ctx.session.user.id))
+        .orderBy(medications.createdAt);
+
+      return meds;
+    } catch (error) {
+      console.error("Error fetching medications:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch medications",
+      });
+    }
+  }),
+
+  updateMedication: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        dosage: z.string(),
+        frequency: z.string(),
+        startDate: z.string(),
+        active: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db
+        .update(medications)
+        .set({
+          name: input.name,
+          dosage: input.dosage,
+          frequency: input.frequency,
+          startDate: input.startDate,
+          active: input.active,
+        })
+        .where(eq(medications.id, input.id));
     }),
 });

@@ -15,6 +15,13 @@
       "when": 1743363730991,
       "tag": "0001_low_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1743371393082,
+      "tag": "0002_volatile_mesmero",
+      "breakpoints": true
     }
   ]
 }

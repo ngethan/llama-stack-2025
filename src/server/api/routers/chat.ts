@@ -4,7 +4,9 @@ import { LlamaStackClient } from "llama-stack-client";
 import { chatMessages, conversations, memory } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
-const client = new LlamaStackClient();
+const client = new LlamaStackClient({
+  baseURL: 'http://localhost:8321'
+});
 
 export const chatRouter = createTRPCRouter({
   chat: protectedProcedure
@@ -63,21 +65,41 @@ export const chatRouter = createTRPCRouter({
         messages.push({ content: input.message, role: "user" });
       }
 
-      const params: LlamaStackClient.InferenceChatCompletionParams = {
-        messages,
-        model_id: "llama-3-70b-chat",
-      };
 
-      const response = await client.inference.chatCompletion(params);
+      const llamaResponse = await fetch("http://localhost:11434/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama3.2-vision",
+          messages: messages,
+          stream: false,
+          TIMEOUT: 10000,
+        }),
+      });
 
-      const aiResponse = response.choices[0].message.content;
+      // const params: LlamaStackClient.InferenceChatCompletionParams = {
+      //   messages,
+      //   model_id: "llama-3-70b-chat",
+      // };
+      // console.log(messages)
+      // console.log(params)
+
+      console.log("1")
+      // const response = await client.inference.chatCompletion(params);
+      const result = await llamaResponse.json();
+      const responseText = result.message?.content ?? "";
+      console.log(responseText
+
+      // const aiResponse = llamaResponse.json.message.content;
 
       // Save AI response to database
       const savedMessage = await ctx.db
         .insert(chatMessages)
         .values({
           userId,
-          message: aiResponse,
+          message: responseText,
           conversationId: input.conversationId,
           isUser: false,
         })

@@ -73,7 +73,9 @@ export const chatRouter = createTRPCRouter({
         },
         body: JSON.stringify({
           model: "llama3.2-vision",
-          messages: messages,
+          messages: 
+          messages,
+          // .push("Answer in 3 sentences or less, also answer in normal text, not markdown."),
           stream: false,
           TIMEOUT: 10000,
         }),
@@ -90,11 +92,9 @@ export const chatRouter = createTRPCRouter({
       // const response = await client.inference.chatCompletion(params);
       const result = await llamaResponse.json();
       const responseText = result.message?.content ?? "";
-      console.log(responseText
 
       // const aiResponse = llamaResponse.json.message.content;
 
-      // Save AI response to database
       const savedMessage = await ctx.db
         .insert(chatMessages)
         .values({
